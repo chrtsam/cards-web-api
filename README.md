@@ -5,24 +5,45 @@ This web api allows users to create and manage tasks in the form of cards
 
 ## Build from source
 ### Prerequisites
-In order to build the project you should have a machine with java 21 installed, maven spring boot and a running MySQL database. Version 8.0 is where the project is tested. As an alternative you can use the include mysql docker container ( docker should be installed in your system ).
+In order to build the project you should have a machine with java installed, maven spring boot and a running MySQL database. Version is where the project is tested. As an alternative you can use the include mysql docker container ( docker should be installed in your system ). The project has been tested with
+- Java 21.0.2
+- Maven 3.3.9
+- MySQL 8.0
 
-The project is a maven project so in orde to build the source run the following
+In order to execute the project you should have a running mysql database. For the integration tests an in memory database is created. If there is no MySQL available you can start one using the include image
 ```
-TODO maven command to build
+cd test-bundle\
+docker-compose up
+```
+In case of an error during the container creation, you can execute the following commands in order to free the 3306 port
+```
+net stop winnat
+netsh int ipv4 add excludedportrange protocol=tcp startport=3306 numberofports=1
+net start winnat
+```
+
+The project is a maven project so in order to build the source run the following from the root folder
+```
+mvn clean package
 ```
 
 ## Execute
 In order to execute the project you should have a running mysql database, and set the connection properties in the folowing file
 ```
+src\main\resources\application.properties
+```
+You should also initiate the database schema using the following commands(powershell specific)
+```
+$env:FLYWAY_URL = 'jdbc:mysql://localhost:3306/card_db'
+$env:FLYWAY_USER = 'user'
+$env:FLYWAY_PASSWORD = 'password'
+mvn flyway:migrate
+```
+
+Finaly to run the project execute the following command
 
 ```
-or else you can use the bundled mysql container with preexisting data
-
-TO run the project execute the following command
-
-```
-TODO maven command to run
+java -jar target\api-1.0.jar
 ```
 
 After a successfull run you can visit the following url to read about how to consume the API
@@ -31,17 +52,7 @@ http://localhost:8080/swagger-ui/index.html
 ```
 
 ### Run the project from a container
-You can also run the project in a fully containerazied manner meaning that only docker is a prerequisite.
-
-Run the following bash script which will build the source and spin up the web api.
-```
-
-```
-The url for the documentation remains the same 
-```
-http://localhost:8080/swagger-ui/index.html
-```
-
+TODO
 
 ## Future work
 - Fully support HATEOAS
@@ -49,6 +60,7 @@ http://localhost:8080/swagger-ui/index.html
 - Add unit tests
 - Add more integration tests
 - Increase the operators support in the search
+- Containarize the application, so no need of java and maven depndencies are needed
 - Improve indexing (maybe some database design changes)
 - Improve Documentation
 - Version resources by using ETags
