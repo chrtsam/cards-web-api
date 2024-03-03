@@ -5,7 +5,7 @@ This web api allows users to create and manage tasks in the form of cards
 
 ## Build from source
 ### Prerequisites
-In order to build the project you should have a machine with java installed, maven spring boot and a running MySQL database. Version is where the project is tested. As an alternative you can use the include mysql docker container ( docker should be installed in your system ). The project has been tested with
+In order to build the project you should have a machine with java installed, maven spring boot and a running MySQL database. As an alternative you can use the include mysql docker container (docker should be installed in your system) . The project has been tested with
 - Java 21.0.2
 - Maven 3.3.9
 - MySQL 8.0
@@ -69,12 +69,24 @@ After a successfull run you can visit the following url to read about how to con
 http://localhost:8080/swagger-ui/index.html
 ```
 
+The database is populated with some initial data. As a reference there are three users:
+- member_one@company.gr:AStrongPass
+- member_two@company.gr:AStrongPass
+- admin@company.gr:AStrongPass (Admin user)
+
+
+The default database connection credentials for the docker container are:
+```
+localhost:3306/card_db
+user@password
+```
+
 
 ## Future work
 - Fully support HATEOAS
 - Implement PACTH endpoint for updates
 - Add unit tests
 - Add more integration tests
-- Improve indexing (maybe some database design changes)
+- Improve indexing (maybe some database redesign)
 - Improve Documentation
 - Version resources by using ETags
