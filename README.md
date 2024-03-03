@@ -48,27 +48,12 @@ http://localhost:8080/swagger-ui/index.html
 ```
 
 
-
-
-```
-cd test-bundle\
-docker-compose up
-```
-In case of an error during the container creation, you can execute the following commands in order to free the 3306 port
-```
-net stop winnat
-netsh int ipv4 add excludedportrange protocol=tcp startport=3306 numberofports=1
-net start winnat
-```
-
-
 ### Run the project from a container
 You can also run the app using docker without the need to build the app manually.
 As a prerequisite you hould have docker installed.
 
 Start the containers using:
 ```
-cd test-bundle\
 docker-compose up -d
 ```
 
