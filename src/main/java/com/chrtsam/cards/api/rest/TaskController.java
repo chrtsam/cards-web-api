@@ -209,10 +209,11 @@ public class TaskController {
     @RequestMapping(value = "/search", method = RequestMethod.POST, consumes = "application/json")
     public HttpEntity searchTasks(@RequestBody SearchRequest searchRequest, Pageable page, @AuthenticationPrincipal AuthUser authenticatedUser) {
         try {
+            List<Condition> entityConditions = TaskDTO.translateConditions(searchRequest.getConditions());
             if (!authenticatedUser.isAdmin()) {
-                searchRequest.getConditions().add(new Condition(Task_.OWNER, Condition.EQUALS, authenticatedUser.getId()));
+                entityConditions.add(new Condition(Task_.OWNER, Condition.EQUALS, authenticatedUser.getId()));
             }
-            Page<Task> resultPage = cardService.searchTasks(searchRequest.getConditions(), page);
+            Page<Task> resultPage = cardService.searchTasks(entityConditions, page);
             List<Task> cards = resultPage.getContent();
             List<TaskDTO> dtoTasks = new ArrayList<>(cards.size());
             for (Task card : cards) {

@@ -2,11 +2,19 @@ package com.chrtsam.cards.api.model.external;
 
 import com.chrtsam.cards.api.model.Task;
 import com.chrtsam.cards.api.model.Status;
+import com.chrtsam.cards.api.model.helper.Condition;
+import com.chrtsam.cards.api.model.helper.ConditionBuilder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 
@@ -16,6 +24,8 @@ import org.modelmapper.TypeMap;
  */
 @Schema(name = "Task", description = "A task assigned, and managed by a user")
 public class TaskDTO {
+
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     @Schema(description = "Tasks identifier. Used only as a reference for the update and find")
     private Integer id;
@@ -97,4 +107,21 @@ public class TaskDTO {
             mapper.map(src -> src.getDateCreated(), TaskDTO::setDateCreated);
         });
     }
+
+    public static List<Condition> translateConditions(List<Condition> conditions) throws ParseException {
+        List<Condition> translated = new ArrayList(conditions.size());
+        for (Condition condition : conditions) {
+            Condition taskCondition = new Condition(condition.getKey(), condition.getOperator());
+            if (condition.getKey().equals("dateCreated")) {
+                java.util.Date dateCr = null;
+                dateCr = dateFormat.parse((String) condition.getValue());
+                taskCondition.setValue(dateCr);
+            } else {
+                taskCondition.setValue(condition.getValue());
+            }
+            translated.add(taskCondition);
+        }
+        return translated;
+    }
+
 }

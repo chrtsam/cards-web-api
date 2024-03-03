@@ -1,5 +1,7 @@
 package com.chrtsam.cards.api.model.helper;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  *
  * @author Chris
@@ -13,11 +15,20 @@ public class Condition {
 
     private String key;
     private Object value;
+    @Schema(description = "Currently supported operatotions are. equals[eq], contains[like] for string text values, greater than [gt], lower than [lt] for date values")
     private String operator;
+
+    public Condition() {
+    }
 
     public Condition(String key, String operator, Object value) {
         this.key = key;
         this.value = value;
+        this.operator = operator;
+    }
+
+    public Condition(String key, String operator) {
+        this.key = key;
         this.operator = operator;
     }
 
