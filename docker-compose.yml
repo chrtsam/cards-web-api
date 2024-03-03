@@ -1,0 +1,39 @@
+version: '3.3'
+services:
+  database:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'card_db'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - mysqldata:/var/lib/mysql
+      - "./app-bundle/database/data/1_base_schema.sql:/docker-entrypoint-initdb.d/1_base_schema.sql"
+      - "./app-bundle/database/data/2_initial_data.sql:/docker-entrypoint-initdb.d/2_initial_data.sql"
+  application:
+    build:
+      context: ./
+      dockerfile: app-bundle/application/web-api/1.0/Dockerfile
+    container_name: Application
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      MYSQL_DB_HOST: 'database'
+      MYSQL_DB_PORT: 3306
+      MYSQL_DB_USERNAME: 'user'
+      MYSQL_DB_PASSWORD: 'password'
+    ports: 
+      - "8080:8080"
+volumes:
+  mysqldata:
