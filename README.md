@@ -10,7 +10,46 @@ In order to build the project you should have a machine with java installed, mav
 - Maven 3.3.9
 - MySQL 8.0
 
-In order to execute the project you should have a running mysql database. For the integration tests an in memory database is created. If there is no MySQL available you can start one using the include image
+The project is a maven project so in order to build the source run the following from the root folder:
+```
+mvn clean package
+```
+
+For the integration tests an in memory database is used.
+
+## Execute
+
+In order to execute the project you should have a running mysql database.
+Before building the application you can set the database configuration using environment variables (powershell specific):
+```
+$env:MYSQL_DB_HOST = '<database hostname e.g localhost>'
+$env:MYSQL_DB_PORT = '3306'
+$env:MYSQL_DB_USERNAME = '<database username>'
+$env:MYSQL_DB_PASSWORD = '<database password>'
+```
+
+The database schema will be automatically created. If you would like to create the schema on demand run the following (powershell specific):
+```
+$env:FLYWAY_URL = '<database url e.g jdbc:mysql://localhost:3306/card_db'> 
+$env:FLYWAY_USER = '<database username>'
+$env:FLYWAY_PASSWORD = '<database password>'
+mvn flyway:migrate
+```
+
+Finaly to run the project execute the following command:
+
+```
+java -jar target\api-1.0.jar
+```
+
+After a successfull run you can visit the following url to read about how to consume the API
+```
+http://localhost:8080/swagger-ui/index.html
+```
+
+
+
+
 ```
 cd test-bundle\
 docker-compose up
@@ -22,28 +61,22 @@ netsh int ipv4 add excludedportrange protocol=tcp startport=3306 numberofports=1
 net start winnat
 ```
 
-The project is a maven project so in order to build the source run the following from the root folder
+
+### Run the project from a container
+You can also run the app using docker without the need to build the app manually.
+As a prerequisite you hould have docker installed.
+
+Start the containers using:
 ```
-mvn clean package
+cd test-bundle\
+docker-compose up -d
 ```
 
-## Execute
-In order to execute the project you should have a running mysql database, and set the connection properties in the folowing file
+During the start of the database container there may be an error regarding the port which is in use. If such an error occurs during the container creation, you can use a different port or alternative you can execute the following commands in order to free the 3306 port:
 ```
-src\main\resources\application.properties
-```
-You should also initiate the database schema using the following commands(powershell specific)
-```
-$env:FLYWAY_URL = 'jdbc:mysql://localhost:3306/card_db'
-$env:FLYWAY_USER = 'user'
-$env:FLYWAY_PASSWORD = 'password'
-mvn flyway:migrate
-```
-
-Finaly to run the project execute the following command
-
-```
-java -jar target\api-1.0.jar
+net stop winnat
+netsh int ipv4 add excludedportrange protocol=tcp startport=3306 numberofports=1
+net start winnat
 ```
 
 After a successfull run you can visit the following url to read about how to consume the API
@@ -51,16 +84,12 @@ After a successfull run you can visit the following url to read about how to con
 http://localhost:8080/swagger-ui/index.html
 ```
 
-### Run the project from a container
-TODO
 
 ## Future work
 - Fully support HATEOAS
 - Implement PACTH endpoint for updates
 - Add unit tests
 - Add more integration tests
-- Increase the operators support in the search
-- Containarize the application, so no need of java and maven depndencies are needed
 - Improve indexing (maybe some database design changes)
 - Improve Documentation
 - Version resources by using ETags
